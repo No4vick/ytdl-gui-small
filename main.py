@@ -1,3 +1,4 @@
+import re
 import time
 
 import dearpygui.dearpygui as dpg
@@ -11,6 +12,7 @@ selected_format = {}
 item_list = []
 filename = ""
 prev_url = ""
+illegal_chars_regex = r"[#%&{}\<>*?/\-$!`\"\':@+|=]"
 
 
 def set_format():
@@ -22,8 +24,12 @@ def set_format():
     # selected_format = formats
 
 
+def reformat_name(title):
+    return re.sub(illegal_chars_regex, '', title)
+
+
 def download_file(url):
-    local_filename = filename
+    local_filename = reformat_name(filename)
     # NOTE the stream=True parameter below
     with requests.get(url, stream=True) as r:
         r.raise_for_status()
@@ -38,6 +44,7 @@ def download_file(url):
 
 
 def download():
+    # TODO add filename popup maybe?
     print(selected_format)
     dpg.disable_item("download btn")
     dpg.configure_item("download btn", label="Downloading...")
@@ -48,6 +55,7 @@ def download():
         dpg.add_text(parent="main window", default_value="Error!", tag="success text")
     finally:
         time.sleep(2)
+        dpg.delete_item("video title")
         dpg.delete_item("fetched items")
         dpg.delete_item("download btn")
         dpg.delete_item("success text")
@@ -96,7 +104,8 @@ def fetch_options(sender, app_data):
                     item_list.append(append_str)
                 else:
                     item_list.append(f"{value['format_note']} ({value['ext']}): Unknown size {additions}")
-
+        
+        dpg.add_text(label, parent="main window", tag="video title")
         dpg.add_radio_button(parent="main window", tag="fetched items", items=item_list, label=label,
                              callback=set_format)
         dpg.add_button(parent="main window", label="Download!", tag="download btn", callback=download)
