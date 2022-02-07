@@ -114,7 +114,7 @@ def fetch_options(sender, app_data):
 
 if __name__ == '__main__':
     dpg.create_context()
-    dpg.create_viewport(title='ytdl-portable', width=600, height=600)
+    dpg.create_viewport(title='ytdl-gui-small', width=600, height=600)
 
     with dpg.window(width=600, height=600, no_title_bar=True, no_move=True, no_resize=True, tag="main window"):
         dpg.add_text("All downloads go to root where the executable is located")
